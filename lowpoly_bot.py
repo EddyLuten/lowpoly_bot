@@ -68,10 +68,14 @@ def bot_main():
         except tweepy.error.TweepError as e:
             print('Error (' + str(tweet.id) + '): ' + e.reason)
 
-            cursor.execute('INSERT INTO processed (tweet_id) VALUES (?)', (tweet.id,))
-            conn.commit()
+            if e.api_code == 429:
+                print('Rate limited, pausing for 15 minutes.')
+                sleep(15 * 60)
+            else:
+                cursor.execute('INSERT INTO processed (tweet_id) VALUES (?)', (tweet.id,))
+                conn.commit()
+                sleep(other_interval)
 
-            sleep(other_interval)
         except StopIteration:
             break
 
