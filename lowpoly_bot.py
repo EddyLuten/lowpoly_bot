@@ -26,13 +26,13 @@ def bot_main():
     api = tweepy.API(auth)
 
     import sqlite3
-    conn = sqlite3.connect('lowpoly_bot.db')
+    conn = sqlite3.connect('./lowpoly_bot.db')
     cursor = conn.cursor()
 
     cursor.execute("CREATE TABLE IF NOT EXISTS processed (tweet_id UNSIGNED BIG INT)")
     conn.commit()
 
-    spammers = open('spammers', 'r').read().split(',')
+    spammers = open('./spammers', 'r').read().split(',')
 
     for tweet in tweepy.Cursor(api.search, q='#lowpoly -filter:retweets filter:media', result_type='recent').items():
         cursor = conn.cursor()
@@ -65,7 +65,7 @@ def bot_main():
 
             print('')
             sleep(tweet_interval)
-        except tweepy.TweepError as e:
+        except tweepy.error.TweepError as e:
             print('Error (' + str(tweet.id) + '): ' + e.reason)
 
             cursor.execute('INSERT INTO processed (tweet_id) VALUES (?)', (tweet.id,))
